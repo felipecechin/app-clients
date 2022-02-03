@@ -28,6 +28,7 @@ class ClienteController extends Controller {
         $rules = [
             'nome' => 'required|regex:/^[a-zA-ZÀ-ú ]+$/',
             'data_nascimento' => 'required|date_format:d/m/Y',
+            'celular' => 'required',
             'cpf' => 'required|cpf',
             'email' => 'required',
             'endereco' => 'required',
@@ -38,6 +39,7 @@ class ClienteController extends Controller {
             'nome.regex' => 'O campo nome não pode ter caracteres especiais',
             'data_nascimento.required' => 'O campo data de nascimento é obrigatório',
             'data_nascimento.date_format' => 'Data de nascimento deve ser válida',
+            'celular.required' => 'O campo celular é obrigatório',
             'cpf.required' => 'O campo CPF é obrigatório',
             'cpf.cpf' => 'CPF deve ser válido',
             'email.required' => 'O campo e-mail é obrigatório',
@@ -56,14 +58,15 @@ class ClienteController extends Controller {
         $birthDate = $birthDate->format('Y-m-d');
         $values = [$request->get('nome'),
             $birthDate,
+            $request->get('celular'),
             $request->get('cpf'),
             $request->get('email'),
             $request->get('endereco'),
             $request->get('observacao')];
 
         DB::insert('insert into clientes
-                            (nome, data_nascimento, cpf, email, endereco, observacao)
-                            values (?, ?, ?, ?, ?, ?)', $values);
+                            (nome, data_nascimento, celular, cpf, email, endereco, observacao)
+                            values (?, ?, ?, ?, ?, ?, ?)', $values);
 
         return response()->json(['mensagem' => 'Cliente inserido com sucesso'], 201);
     }
@@ -98,6 +101,7 @@ class ClienteController extends Controller {
         $rules = [
             'nome' => 'required|regex:/^[a-zA-ZÀ-ú ]+$/',
             'data_nascimento' => 'required|date_format:d/m/Y',
+            'celular' => 'required',
             'cpf' => 'required|cpf',
             'email' => 'required',
             'endereco' => 'required',
@@ -108,6 +112,7 @@ class ClienteController extends Controller {
             'nome.regex' => 'O campo nome não pode ter caracteres especiais',
             'data_nascimento.required' => 'O campo data de nascimento é obrigatório',
             'data_nascimento.date_format' => 'Data de nascimento deve ser válida',
+            'celular.required' => 'O campo celular é obrigatório',
             'cpf.required' => 'O campo CPF é obrigatório',
             'cpf.cpf' => 'CPF deve ser válido',
             'email.required' => 'O campo e-mail é obrigatório',
@@ -124,6 +129,7 @@ class ClienteController extends Controller {
         $birthDate = $birthDate->format('Y-m-d');
         $values = ['nome' => $request->get('nome'),
             'data_nascimento' => $birthDate,
+            'celular' => $request->get('celular'),
             'cpf' => $request->get('cpf'),
             'email' => $request->get('email'),
             'endereco' => $request->get('endereco'),
@@ -133,6 +139,7 @@ class ClienteController extends Controller {
         DB::update(
             'update clientes set nome = :nome,
                     data_nascimento = :data_nascimento,
+                    celular = :celular,
                     cpf = :cpf,
                     email = :email,
                     endereco = :endereco,
