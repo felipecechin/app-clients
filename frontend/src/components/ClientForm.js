@@ -64,7 +64,13 @@ function ClientForm() {
             await api.put("/api/cliente/" + id, data).then(response => {
                 toast.success(response.data.mensagem)
             }).catch(error => {
-                toast.error(error.response.data.erro)
+                let erros = error.response.data.erro;
+                erros = Object.values(erros);
+                erros.forEach((item) => {
+                    item.forEach((mensagem) => {
+                        toast.error(mensagem)
+                    })
+                })
             }).finally(() => {
                 setHiddenButton(false)
             })
