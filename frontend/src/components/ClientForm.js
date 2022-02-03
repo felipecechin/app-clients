@@ -5,6 +5,7 @@ import {toast} from "react-toastify";
 import Menu from "../utils/Menu";
 import InputMask from 'react-input-mask';
 import {useLocation, useParams} from "react-router-dom";
+import moment from "moment";
 
 function ClientForm() {
     const {id} = useParams();
@@ -36,6 +37,13 @@ function ClientForm() {
                 const result = await api.get('/api/cliente/' + id);
                 if (result.data) {
                     setName(result.data.nome)
+                    let date = moment(result.data.data_nascimento, 'YYYY-MM-DD')
+                    setBirthDate(date.format('DD/MM/YYYY'))
+                    setCpf(result.data.cpf)
+                    setCellPhone(result.data.celular)
+                    setEmail(result.data.email)
+                    setAddress(result.data.endereco)
+                    setNote(result.data.observacao)
                 }
             } catch (e) {
                 toast.error('Erro ao buscar cliente.')
@@ -45,7 +53,7 @@ function ClientForm() {
         if (id) {
             getClient(id)
         }
-    }, [])
+    }, [id])
 
     async function handleSubmit(e) {
         e.preventDefault();

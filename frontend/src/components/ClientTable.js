@@ -25,12 +25,13 @@ function ClientForm() {
                 setClients(result.data.clientes);
             }
         } catch (e) {
-            toast.error('Erro ao buscar registros de protocolo(s).')
+            toast.error('Erro ao buscar registros de cliente(s).')
         }
     }
+
     useEffect(() => {
         getClients();
-    }, [page]);
+    }, [page, search]);
 
     useEffect(() => {
         const searchText = async () => {
@@ -59,7 +60,7 @@ function ClientForm() {
                         Editar
                     </Button>
                     <Button variant="danger" onClick={() => handleDeleteClient(props.id)}
-                            className="text-white ms-2">
+                            className="text-white ms-2 mt-1 mt-md-0">
                         Excluir
                     </Button>
                 </td>
