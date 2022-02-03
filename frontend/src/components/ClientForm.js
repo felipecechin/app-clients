@@ -1,52 +1,95 @@
 import {Button, Card, Col, Container, Form, Row} from "react-bootstrap";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import api from "../services/api";
 import {toast} from "react-toastify";
 import Menu from "../utils/Menu";
 import InputMask from 'react-input-mask';
+import {useLocation, useParams} from "react-router-dom";
 
 function ClientForm() {
-    const [nome, setNome] = useState("")
-    const [dataNascimento, setDataNascimento] = useState("")
+    const {id} = useParams();
+    const [name, setName] = useState("")
+    const [birthDate, setBirthDate] = useState("")
     const [cpf, setCpf] = useState("")
-    const [celular, setCelular] = useState("")
+    const [cellPhone, setCellPhone] = useState("")
     const [email, setEmail] = useState("")
-    const [endereco, setEndereco] = useState("")
-    const [observacao, setObservacao] = useState("")
-    const [esconderSubmit, setEsconderSubmit] = useState(false)
+    const [address, setAddress] = useState("")
+    const [note, setNote] = useState("")
+    const [hiddenButton, setHiddenButton] = useState(false)
+    const location = useLocation();
+    useEffect(() => {
+        if (location.pathname === '/') {
+            setName("")
+            setBirthDate("")
+            setCpf("")
+            setEmail("")
+            setCellPhone("")
+            setAddress("")
+            setNote("")
+        }
+    }, [location]);
+
+
+    useEffect(() => {
+        async function getClient(id) {
+            try {
+                const result = await api.get('/api/cliente/' + id);
+                if (result.data) {
+                    setName(result.data.nome)
+                }
+            } catch (e) {
+                toast.error('Erro ao buscar cliente.')
+            }
+        }
+
+        if (id) {
+            getClient(id)
+        }
+    }, [])
 
     async function handleSubmit(e) {
         e.preventDefault();
-        setEsconderSubmit(true);
+        setHiddenButton(true);
         const data = {
-            nome,
-            data_nascimento: dataNascimento,
+            nome: name,
+            data_nascimento: birthDate,
             cpf,
             email,
-            celular,
-            endereco,
-            observacao
+            celular: cellPhone,
+            endereco: address,
+            observacao: note
         }
-        await api.post("/api/cliente", data).then(response => {
-            toast.success(response.data.mensagem)
-            setNome("")
-            setDataNascimento("")
-            setCpf("")
-            setEmail("")
-            setCelular("")
-            setEndereco("")
-            setObservacao("")
-        }).catch(error => {
-            let erros = error.response.data.erro;
-            erros = Object.values(erros);
-            erros.forEach((item) => {
-                item.forEach((mensagem) => {
-                    toast.error(mensagem)
-                })
+
+        if (id) {
+            await api.put("/api/cliente/" + id, data).then(response => {
+                toast.success(response.data.mensagem)
+            }).catch(error => {
+                toast.error(error.response.data.erro)
+            }).finally(() => {
+                setHiddenButton(false)
             })
-        }).finally(() => {
-            setEsconderSubmit(false)
-        })
+        } else {
+            await api.post("/api/cliente", data).then(response => {
+                toast.success(response.data.mensagem)
+                setName("")
+                setBirthDate("")
+                setCpf("")
+                setEmail("")
+                setCellPhone("")
+                setAddress("")
+                setNote("")
+            }).catch(error => {
+                let erros = error.response.data.erro;
+                erros = Object.values(erros);
+                erros.forEach((item) => {
+                    item.forEach((mensagem) => {
+                        toast.error(mensagem)
+                    })
+                })
+            }).finally(() => {
+                setHiddenButton(false)
+            })
+        }
     }
 
     return (
@@ -60,14 +103,16 @@ function ClientForm() {
 
                         <Card>
                             <Form onSubmit={handleSubmit}>
-                                <Card.Header>Cadastro de cliente</Card.Header>
+                                <Card.Header>
+                                    {id && 'Editar cliente'}
+                                    {!id && 'Cadastro de cliente'}</Card.Header>
                                 <Card.Body>
                                     <Row>
                                         <Col md={6}>
                                             <Form.Group className="mb-3">
                                                 <Form.Label>Nome</Form.Label>
-                                                <Form.Control type="text" value={nome}
-                                                              onChange={(e) => setNome(e.currentTarget.value)}
+                                                <Form.Control type="text" value={name}
+                                                              onChange={(e) => setName(e.currentTarget.value)}
                                                 />
                                             </Form.Group>
                                         </Col>
@@ -77,10 +122,10 @@ function ClientForm() {
                                                 <InputMask
                                                     mask={'99/99/9999'}
                                                     formatChars={{9: '[0-9]'}}
-                                                    onChange={(e) => setDataNascimento(e.currentTarget.value)}
+                                                    onChange={(e) => setBirthDate(e.currentTarget.value)}
                                                     className={'form-control'}
                                                     placeholder={''}
-                                                    value={dataNascimento}
+                                                    value={birthDate}
                                                 />
                                             </Form.Group>
                                         </Col>
@@ -105,10 +150,10 @@ function ClientForm() {
                                                 <InputMask
                                                     mask={'(99) 9999-9999'}
                                                     formatChars={{9: '[0-9]'}}
-                                                    onChange={(e) => setCelular(e.currentTarget.value)}
+                                                    onChange={(e) => setCellPhone(e.currentTarget.value)}
                                                     className={'form-control'}
                                                     placeholder={''}
-                                                    value={celular}
+                                                    value={cellPhone}
                                                 />
                                             </Form.Group>
                                         </Col>
@@ -125,8 +170,8 @@ function ClientForm() {
                                         <Col md={6}>
                                             <Form.Group className="mb-3">
                                                 <Form.Label>Endereço completo</Form.Label>
-                                                <Form.Control type="text" value={endereco}
-                                                              onChange={(e) => setEndereco(e.currentTarget.value)}
+                                                <Form.Control type="text" value={address}
+                                                              onChange={(e) => setAddress(e.currentTarget.value)}
                                                 />
                                             </Form.Group>
                                         </Col>
@@ -134,13 +179,13 @@ function ClientForm() {
                                     <Row>
                                         <Col md={12}>
                                             <Form.Label>Observações</Form.Label>
-                                            <Form.Control as={'textarea'} value={observacao}
-                                                          onChange={(e) => setObservacao(e.currentTarget.value)}/>
+                                            <Form.Control as={'textarea'} value={note}
+                                                          onChange={(e) => setNote(e.currentTarget.value)}/>
                                         </Col>
                                     </Row>
                                 </Card.Body>
                                 <Card.Footer className={"d-flex justify-content-end"}>
-                                    {!esconderSubmit && <Button variant={"primary"} type={"submit"}>Enviar</Button>}
+                                    {!hiddenButton && <Button variant={"primary"} type={"submit"}>Enviar</Button>}
                                 </Card.Footer>
                             </Form>
                         </Card>

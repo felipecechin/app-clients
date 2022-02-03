@@ -1,42 +1,83 @@
-import {Button, Card, Col, Container, Form, Nav, Navbar, NavDropdown, Row} from "react-bootstrap";
-import {useState} from "react";
+import {Button, Card, Col, Container, Form, InputGroup, Nav, Row, Table} from "react-bootstrap";
+import {useEffect, useState} from "react";
+import Menu from "../utils/Menu";
 import api from "../services/api";
 import {toast} from "react-toastify";
-import routes from "../Routes";
-import Menu from "../utils/Menu";
+import {useHistory} from "react-router-dom";
+import ReactPaginate from "react-paginate";
 
 function ClientForm() {
-    const [nome, setNome] = useState("")
-    const [dataNascimento, setDataNascimento] = useState("")
-    const [cpf, setCpf] = useState("")
-    const [celular, setCelular] = useState("")
-    const [email, setEmail] = useState("")
-    const [endereco, setEndereco] = useState("")
-    const [observacao, setObservacao] = useState("")
+    const [search, setSearch] = useState("")
+    const [page, setPage] = useState(1);
+    const [total, setTotal] = useState(0);
+    const [pageCount, setPageCount] = useState(0);
+    const [clients, setClients] = useState([])
+    const history = useHistory();
+    useEffect(() => {
+        setPageCount(Math.ceil(total / 10))
+    }, [total])
 
-    async function handleSubmit(e) {
-        e.preventDefault();
-        const data = {
-            nome,
-            data_nascimento: dataNascimento,
-            cpf,
-            email,
-            celular,
-            endereco,
-            observacao
+    const getClients = async () => {
+        try {
+            const result = await api.get('/api/cliente?search=' + search + '&page=' + page);
+            if (result.data) {
+                setTotal(result.data.total);
+                setClients(result.data.clientes);
+            }
+        } catch (e) {
+            toast.error('Erro ao buscar registros de protocolo(s).')
         }
-        await api.post("/api/cliente", data).then(response => {
-            toast.success(response.mensagem)
+    }
+    useEffect(() => {
+        getClients();
+    }, [page]);
+
+    useEffect(() => {
+        const searchText = async () => {
+            await setPage(1);
+            getClients();
+        }
+        searchText();
+    }, [search])
+
+    const handlePageClick = (data) => {
+        setPage(data.selected + 1)
+    }
+
+    const TableRow = (props) => {
+        return (
+            <tr>
+                <td className={'text-wrap'}>
+                    {props.nome}
+                </td>
+                <td>
+                    {props.email}
+                </td>
+                <td>
+                    <Button variant="primary" onClick={() => handleEditClient(props.id)}
+                            className="text-white ms-2">
+                        Editar
+                    </Button>
+                    <Button variant="danger" onClick={() => handleDeleteClient(props.id)}
+                            className="text-white ms-2">
+                        Excluir
+                    </Button>
+                </td>
+            </tr>
+        );
+    };
+
+    const handleEditClient = (id) => {
+        history.push('/editar/' + id)
+    }
+
+    const handleDeleteClient = async (id) => {
+        await api.delete('/api/cliente/' + id
+        ).then(response => {
+            toast.success(response.data.mensagem);
+            getClients();
         }).catch(error => {
-            let erros = error.response.data.erro;
-            console.log(erros)
-            console.log(Object.values(erros))
-            erros = Object.values(erros)
-            erros.forEach((item) => {
-                item.forEach((mensagem) => {
-                    toast.error(mensagem)
-                })
-            })
+            toast.error(error.data.erro);
         })
     }
 
@@ -50,69 +91,62 @@ function ClientForm() {
                     <Col md={8}>
 
                         <Card>
-                            <Form onSubmit={handleSubmit}>
-                                <Card.Header>Cadastro de cliente</Card.Header>
-                                <Card.Body>
-                                    <Row>
-                                        <Col md={6}>
-                                            <Form.Group className="mb-3">
-                                                <Form.Label>Nome</Form.Label>
-                                                <Form.Control type="text" value={nome}
-                                                              onChange={(e) => setNome(e.currentTarget.value)}/>
-                                            </Form.Group>
-                                        </Col>
-                                        <Col md={6}>
-                                            <Form.Group className="mb-3">
-                                                <Form.Label>Data de nascimento</Form.Label>
-                                                <Form.Control type="text" value={dataNascimento}
-                                                              onChange={(e) => setDataNascimento(e.currentTarget.value)}/>
-                                            </Form.Group>
-                                        </Col>
-                                    </Row>
-                                    <Row>
-                                        <Col md={6}>
-                                            <Form.Group className="mb-3">
-                                                <Form.Label>CPF</Form.Label>
-                                                <Form.Control type="text" value={cpf}
-                                                              onChange={(e) => setCpf(e.currentTarget.value)}/>
-                                            </Form.Group>
-                                        </Col>
-                                        <Col md={6}>
-                                            <Form.Group className="mb-3">
-                                                <Form.Label>Celular</Form.Label>
-                                                <Form.Control type="text" value={celular}
-                                                              onChange={(e) => setCelular(e.currentTarget.value)}/>
-                                            </Form.Group>
-                                        </Col>
-                                    </Row>
-                                    <Row>
-                                        <Col md={6}>
-                                            <Form.Group className="mb-3">
-                                                <Form.Label>E-mail</Form.Label>
-                                                <Form.Control type="email" value={email}
-                                                              onChange={(e) => setEmail(e.currentTarget.value)}/>
-                                            </Form.Group>
-                                        </Col>
-                                        <Col md={6}>
-                                            <Form.Group className="mb-3">
-                                                <Form.Label>Endereço completo</Form.Label>
-                                                <Form.Control type="text" value={endereco}
-                                                              onChange={(e) => setEndereco(e.currentTarget.value)}/>
-                                            </Form.Group>
-                                        </Col>
-                                    </Row>
-                                    <Row>
-                                        <Col md={12}>
-                                            <Form.Label>Observações</Form.Label>
-                                            <Form.Control as={'textarea'} value={observacao}
-                                                          onChange={(e) => setObservacao(e.currentTarget.value)}/>
-                                        </Col>
-                                    </Row>
-                                </Card.Body>
-                                <Card.Footer className={"d-flex justify-content-end"}>
-                                    <Button variant={"primary"} type={"submit"}>Enviar</Button>
-                                </Card.Footer>
-                            </Form>
+                            <Card.Header>Lista de clientes</Card.Header>
+                            <Card.Body>
+                                <Row className="justify-content-start align-items-center mb-3">
+                                    <Col xs={8} md={6} lg={6}>
+                                        <InputGroup size={"sm"}>
+                                            <InputGroup.Text>
+                                                Pesquisar
+                                            </InputGroup.Text>
+                                            <Form.Control type="text" placeholder="Nome ou e-mail" value={search}
+                                                          onChange={(e) => setSearch(e.currentTarget.value)}/>
+                                        </InputGroup>
+                                    </Col>
+                                </Row>
+                                <Table striped bordered hover>
+                                    <thead>
+                                    <tr>
+                                        <th>Nome</th>
+                                        <th>E-mail</th>
+                                        <th></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {clients.map(c => <TableRow key={`clients-${c.id}`} {...c} />)}
+                                    </tbody>
+                                </Table>
+                            </Card.Body>
+                            <Card.Footer className="px-3 border-0 d-lg-flex align-items-center justify-content-between">
+                                <Nav>
+                                    {pageCount > 0 && (
+                                        <ReactPaginate
+                                            previousLabel={'Prévio'}
+                                            nextLabel={'Próximo'}
+                                            breakLabel={'...'}
+                                            pageCount={pageCount}
+                                            marginPagesDisplayed={0}
+                                            pageRangeDisplayed={3}
+                                            onPageChange={handlePageClick}
+                                            containerClassName={'pagination mb-2 mb-lg-0'}
+                                            pageClassName={'page-item'}
+                                            pageLinkClassName={'page-link'}
+                                            previousClassName={'page-item'}
+                                            previousLinkClassName={'page-link'}
+                                            nextClassName={'page-item'}
+                                            nextLinkClassName={'page-link'}
+                                            breakClassName={'page-item'}
+                                            breakLinkClassName={'page-link'}
+                                            activeClassName={'active'}
+                                            forcePage={page - 1}
+                                        />
+                                    )}
+                                </Nav>
+                                {total > 0 ? (
+                                    <small
+                                        className="fw-bold">Mostrando <b>{clients.length}</b> de <b>{total}</b> registro(s).</small>
+                                ) : <small className="fw-bold">Sem registros.</small>}
+                            </Card.Footer>
                         </Card>
                     </Col>
                     <Col md={2}>

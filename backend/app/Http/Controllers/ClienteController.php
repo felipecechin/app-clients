@@ -13,9 +13,25 @@ class ClienteController extends Controller {
      *
      * @return \Illuminate\Http\Response
      */
-    public function index() {
-        $results = DB::select('select * from clientes');
-        return response()->json($results);
+    public function index(Request $request) {
+        $numItemsPage = 10;
+        if ($request->get('page')) {
+            $page = $request->get('page');
+            $offset = ($page - 1) * $numItemsPage;
+        } else {
+            $offset = 0;
+        }
+
+        if ($request->get('search')) {
+            $search = '%' . $request->get('search') . '%';
+        } else {
+            $search = '%%';
+        }
+
+        $results = DB::select('select * from clientes where nome like ? or email like ? limit ' . $offset . ',' . $numItemsPage, [$search, $search]);
+        $total = DB::select('select count(*) as num from clientes where nome like ? or email like ?', [$search, $search]);
+        $total = $total[0]->num;
+        return response()->json(['total' => $total, 'clientes' => $results]);
     }
 
     /**

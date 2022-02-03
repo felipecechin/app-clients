@@ -7,6 +7,7 @@ const Routes = () => (
         <Switch>
             <Route component={ClientForm} path="/" exact/>
             <Route component={ClientTable} path="/listar" exact/>
+            <Route component={ClientForm} path="/editar/:id" exact/>
         </Switch>
     </BrowserRouter>
 );
