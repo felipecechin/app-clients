@@ -1,5 +1,5 @@
 import {Button, Card, Col, Container, Form, InputGroup, Nav, Row, Table} from "react-bootstrap";
-import {useEffect, useState} from "react";
+import {useEffect, useReducer, useState} from "react";
 import Menu from "../utils/Menu";
 import api from "../services/api";
 import {toast} from "react-toastify";
@@ -17,26 +17,26 @@ function ClientForm() {
         setPageCount(Math.ceil(total / 10))
     }, [total])
 
-    const getClients = async () => {
+    const getClients = async (paramSearch, paramPage) => {
         try {
-            const result = await api.get('/api/cliente?search=' + search + '&page=' + page);
+            const result = await api.get('/api/client?search=' + paramSearch + '&page=' + paramPage);
             if (result.data) {
                 setTotal(result.data.total);
-                setClients(result.data.clientes);
+                setClients(result.data.clients);
             }
         } catch (e) {
-            toast.error('Erro ao buscar registros de cliente(s).')
+            toast.error('Erro ao buscar registros de cliente(s)')
         }
     }
 
     useEffect(() => {
-        getClients();
-    }, [page, search]);
+        getClients(search, page);
+    }, [page]);
 
     useEffect(() => {
         const searchText = async () => {
-            await setPage(1);
-            getClients();
+            setPage(1);
+            getClients(search, 1)
         }
         searchText();
     }, [search])
@@ -49,7 +49,7 @@ function ClientForm() {
         return (
             <tr>
                 <td className={'text-wrap'}>
-                    {props.nome}
+                    {props.name}
                 </td>
                 <td>
                     {props.email}
@@ -73,12 +73,12 @@ function ClientForm() {
     }
 
     const handleDeleteClient = async (id) => {
-        await api.delete('/api/cliente/' + id
+        await api.delete('/api/client/' + id
         ).then(response => {
-            toast.success(response.data.mensagem);
+            toast.success(response.data.message);
             getClients();
         }).catch(error => {
-            toast.error(error.data.erro);
+            toast.error(error.response.data.error);
         })
     }
 

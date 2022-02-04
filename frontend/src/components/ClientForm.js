@@ -34,16 +34,16 @@ function ClientForm() {
     useEffect(() => {
         async function getClient(id) {
             try {
-                const result = await api.get('/api/cliente/' + id);
+                const result = await api.get('/api/client/' + id);
                 if (result.data) {
-                    setName(result.data.nome)
-                    let date = moment(result.data.data_nascimento, 'YYYY-MM-DD')
+                    setName(result.data.name)
+                    let date = moment(result.data.birthdate, 'YYYY-MM-DD')
                     setBirthDate(date.format('DD/MM/YYYY'))
                     setCpf(result.data.cpf)
-                    setCellPhone(result.data.celular)
+                    setCellPhone(result.data.cellphone)
                     setEmail(result.data.email)
-                    setAddress(result.data.endereco)
-                    setNote(result.data.observacao)
+                    setAddress(result.data.address)
+                    setNote(result.data.note)
                 }
             } catch (e) {
                 toast.error('Erro ao buscar cliente.')
@@ -59,32 +59,36 @@ function ClientForm() {
         e.preventDefault();
         setHiddenButton(true);
         const data = {
-            nome: name,
-            data_nascimento: birthDate,
+            name,
+            birthdate: birthDate,
             cpf,
             email,
-            celular: cellPhone,
-            endereco: address,
-            observacao: note
+            cellphone: cellPhone,
+            address,
+            note
         }
 
         if (id) {
-            await api.put("/api/cliente/" + id, data).then(response => {
-                toast.success(response.data.mensagem)
+            await api.put("/api/client/" + id, data).then(response => {
+                toast.success(response.data.message)
             }).catch(error => {
-                let erros = error.response.data.erro;
-                erros = Object.values(erros);
-                erros.forEach((item) => {
-                    item.forEach((mensagem) => {
-                        toast.error(mensagem)
+                if (error.response) {
+                    let errors = error.response.data.error;
+                    errors = Object.values(errors);
+                    errors.forEach((item) => {
+                        item.forEach((message) => {
+                            toast.error(message)
+                        })
                     })
-                })
+                } else {
+                    toast.error('Ocorreu algum erro ao enviar formulário')
+                }
             }).finally(() => {
                 setHiddenButton(false)
             })
         } else {
-            await api.post("/api/cliente", data).then(response => {
-                toast.success(response.data.mensagem)
+            await api.post("/api/client", data).then(response => {
+                toast.success(response.data.message)
                 setName("")
                 setBirthDate("")
                 setCpf("")
@@ -93,13 +97,17 @@ function ClientForm() {
                 setAddress("")
                 setNote("")
             }).catch(error => {
-                let erros = error.response.data.erro;
-                erros = Object.values(erros);
-                erros.forEach((item) => {
-                    item.forEach((mensagem) => {
-                        toast.error(mensagem)
+                if (error.response) {
+                    let errors = error.response.data.error;
+                    errors = Object.values(errors);
+                    errors.forEach((item) => {
+                        item.forEach((message) => {
+                            toast.error(message)
+                        })
                     })
-                })
+                } else {
+                    toast.error('Ocorreu algum erro ao enviar formulário')
+                }
             }).finally(() => {
                 setHiddenButton(false)
             })
