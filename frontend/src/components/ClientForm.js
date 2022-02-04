@@ -205,7 +205,7 @@ function ClientForm() {
                                     </Row>
                                     <Row>
                                         <Col md={12}>
-                                            <Form.Label>Observações</Form.Label>
+                                            <Form.Label>Observação</Form.Label>
                                             <Form.Control as={'textarea'} value={note}
                                                           onChange={(e) => setNote(e.currentTarget.value)}/>
                                         </Col>
