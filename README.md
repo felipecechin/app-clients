@@ -11,6 +11,8 @@ Foram utilizadas as seguintes tecnologias no backend:
 Foram utilizadas as seguintes tecnologias no frontend:
 
 - ReactJS 17.0.2 com Bootstrap 5.1.3
+- Versão do Node utilizada: 14.11.0
+- Versão do NPM: 6.14.8
 
 ## Ao clonar repositório
 
@@ -21,4 +23,6 @@ Foram utilizadas as seguintes tecnologias no frontend:
 4. Executar comando ```composer install``` para instalar dependências
 5. Executar comando ```php artisan serve``` para inicializar backend
 6. Entrar na pasta frontend
-7. Executar comando ```npm install && npm start``` para inicializar frontend
+7. Executar comando ```npm install``` para instalar dependências
+8. Executar comando ```npm start```
+9. Acessar sistema pela url http://localhost:3000

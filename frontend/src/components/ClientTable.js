@@ -1,5 +1,5 @@
 import {Button, Card, Col, Container, Form, InputGroup, Nav, Row, Table} from "react-bootstrap";
-import {useEffect, useReducer, useState} from "react";
+import {useEffect, useState} from "react";
 import Menu from "../utils/Menu";
 import api from "../services/api";
 import {toast} from "react-toastify";
