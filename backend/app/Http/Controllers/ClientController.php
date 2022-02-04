@@ -51,11 +51,11 @@ class ClientController extends Controller {
             'note' => 'max:300'
         ];
         $messages = [
-            'name.required' => 'O campo name é obrigatório',
-            'name.regex' => 'O campo name não pode ter caracteres especiais',
+            'name.required' => 'O campo nome é obrigatório',
+            'name.regex' => 'O campo nome não pode ter caracteres especiais',
             'birthdate.required' => 'O campo data de nascimento é obrigatório',
             'birthdate.date_format' => 'Data de nascimento deve ser válida',
-            'cellphone.required' => 'O campo cellphone é obrigatório',
+            'cellphone.required' => 'O campo celular é obrigatório',
             'cpf.required' => 'O campo CPF é obrigatório',
             'cpf.cpf' => 'CPF deve ser válido',
             'cpf.unique' => 'CPF já existe',
@@ -125,11 +125,11 @@ class ClientController extends Controller {
             'note' => 'max:300'
         ];
         $messages = [
-            'name.required' => 'O campo name é obrigatório',
-            'name.regex' => 'O campo name não pode ter caracteres especiais',
+            'name.required' => 'O campo nome é obrigatório',
+            'name.regex' => 'O campo nome não pode ter caracteres especiais',
             'birthdate.required' => 'O campo data de nascimento é obrigatório',
             'birthdate.date_format' => 'Data de nascimento deve ser válida',
-            'cellphone.required' => 'O campo cellphone é obrigatório',
+            'cellphone.required' => 'O campo celular é obrigatório',
             'cpf.required' => 'O campo CPF é obrigatório',
             'cpf.cpf' => 'CPF deve ser válido',
             'cpf.unique' => 'CPF já existe',

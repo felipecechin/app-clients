@@ -43,7 +43,7 @@ function ClientForm() {
                     setCellPhone(result.data.cellphone)
                     setEmail(result.data.email)
                     setAddress(result.data.address)
-                    setNote(result.data.note)
+                    setNote(result.data.note || '')
                 }
             } catch (e) {
                 toast.error('Erro ao buscar cliente.')
@@ -57,17 +57,21 @@ function ClientForm() {
 
     async function handleSubmit(e) {
         e.preventDefault();
-        setHiddenButton(true);
         const data = {
             name,
             birthdate: birthDate,
             cpf,
             email,
             cellphone: cellPhone,
-            address,
-            note
+            address
         }
-
+        const isEmpty = Object.values(data).some(x => (x == null || x === ''));
+        if (isEmpty) {
+            toast.error('Por favor, preencha todos os campos obrigatórios')
+            return
+        }
+        setHiddenButton(true);
+        data.note = note
         if (id) {
             await api.put("/api/client/" + id, data).then(response => {
                 toast.success(response.data.message)
@@ -126,13 +130,14 @@ function ClientForm() {
                         <Card>
                             <Form onSubmit={handleSubmit}>
                                 <Card.Header>
-                                    {id && 'Editar cliente'}
-                                    {!id && 'Cadastro de cliente'}</Card.Header>
+                                    {id && 'Editar cliente (obrigatórios *)'}
+                                    {!id && 'Cadastro de cliente (obrigatórios *)'}
+                                </Card.Header>
                                 <Card.Body>
                                     <Row>
                                         <Col md={6}>
                                             <Form.Group className="mb-3">
-                                                <Form.Label>Nome</Form.Label>
+                                                <Form.Label>Nome*</Form.Label>
                                                 <Form.Control type="text" value={name}
                                                               onChange={(e) => setName(e.currentTarget.value)}
                                                 />
@@ -140,7 +145,7 @@ function ClientForm() {
                                         </Col>
                                         <Col md={6}>
                                             <Form.Group className="mb-3">
-                                                <Form.Label>Data de nascimento</Form.Label>
+                                                <Form.Label>Data de nascimento*</Form.Label>
                                                 <InputMask
                                                     mask={'99/99/9999'}
                                                     formatChars={{9: '[0-9]'}}
@@ -155,7 +160,7 @@ function ClientForm() {
                                     <Row>
                                         <Col md={6}>
                                             <Form.Group className="mb-3">
-                                                <Form.Label>CPF</Form.Label>
+                                                <Form.Label>CPF*</Form.Label>
                                                 <InputMask
                                                     mask={'999.999.999-99'}
                                                     formatChars={{9: '[0-9]'}}
@@ -168,7 +173,7 @@ function ClientForm() {
                                         </Col>
                                         <Col md={6}>
                                             <Form.Group className="mb-3">
-                                                <Form.Label>Celular</Form.Label>
+                                                <Form.Label>Celular*</Form.Label>
                                                 <InputMask
                                                     mask={'(99) 9999-9999'}
                                                     formatChars={{9: '[0-9]'}}
@@ -183,7 +188,7 @@ function ClientForm() {
                                     <Row>
                                         <Col md={6}>
                                             <Form.Group className="mb-3">
-                                                <Form.Label>E-mail</Form.Label>
+                                                <Form.Label>E-mail*</Form.Label>
                                                 <Form.Control type="email" value={email}
                                                               onChange={(e) => setEmail(e.currentTarget.value)}
                                                 />
@@ -191,7 +196,7 @@ function ClientForm() {
                                         </Col>
                                         <Col md={6}>
                                             <Form.Group className="mb-3">
-                                                <Form.Label>Endereço completo</Form.Label>
+                                                <Form.Label>Endereço completo*</Form.Label>
                                                 <Form.Control type="text" value={address}
                                                               onChange={(e) => setAddress(e.currentTarget.value)}
                                                 />
