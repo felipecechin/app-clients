@@ -17,6 +17,7 @@ Foram utilizadas as seguintes tecnologias no frontend:
 ## Ao clonar repositório
 
 1. Rodar script SQL ```db.sql``` do repositório dentro do banco de dados MySQL
+    1. Observação: optei por não utilizar as ```migrations``` do Laravel e criar o banco via script
 2. Entrar na pasta backend
 3. Criar o arquivo de ambiente .env com base no arquivo .env.example e definir parâmetros de conexão do banco MySQL
     1. Nome do banco: app_clients
