@@ -76,7 +76,8 @@ function ClientForm() {
         await api.delete('/api/client/' + id
         ).then(response => {
             toast.success(response.data.message);
-            getClients();
+            setPage(1);
+            getClients(search, 1);
         }).catch(error => {
             toast.error(error.response.data.error);
         })
